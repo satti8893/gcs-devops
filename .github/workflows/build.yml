@@ -18,7 +18,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -44,4 +44,15 @@ jobs:
       ## Build Application
       - name: Build SampleApplication
         run: ./gradlew --no-daemon build
+
+      ## Check emulator
+      - name: Emulator check
+        uses: ReactiveCircus/android-emulator-runner@v2.21.0
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profilr: Nexus 6
+          script: ./graldew connectedCheck
+
 
