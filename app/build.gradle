@@ -1,0 +1,199 @@
+plugins {
+    id 'com.android.application'
+    id 'jacoco'
+    id "org.sonarqube" version "3.3"
+    id 'com.google.gms.google-services'
+}
+
+jacoco {
+    toolVersion = '0.8.7'
+}
+
+android {
+    compileSdk 31
+
+    defaultConfig {
+        applicationId "com.ga_gcs.logintest"
+        minSdk 22
+        targetSdk 30
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "com.ga_gcs.logintest.MockRunnerTest"
+    }
+
+    buildTypes {
+        debug {
+            testCoverageEnabled true // Required for Instrumentation testing
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildFeatures {
+        viewBinding true
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
+        animationsDisabled true
+        unitTests.includeAndroidResources = true
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true // To include Robolectric tests in the Jacoco report
+                jacoco.excludes = ['jdk.internal.*'] // Allows it to run on Java 11
+            }
+        }
+    }
+    packagingOptions {
+        exclude 'LICENSE.txt'
+    }
+}
+
+def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
+//def fileFilter = ['**/databinding/**/*.*',
+//                  '**/android/databinding/*Binding.*',
+//                  '**/BR.*',
+//                  '**/R.*',
+//                  '**/R$*.*',
+//                  '**/BuildConfig.*',
+//                  '**/Manifest*.*',
+//                  '**/*_MembersInjector.*',
+//                  '**/Dagger*Component.*',
+//                  '**/Dagger*Component$Builder.*',
+//                  '**/*Module_*Factory.*',
+//                  '**/*Fragment*.*',
+//                  '**/*Activity*.*',
+//                  '**/*Adapter*.*',
+//                  '**/*ViewPager*.*',
+//                  '**/*ViewHolder*.*',
+//                  '**/*Module*.*']
+def debugTree = fileTree(dir: "${project.buildDir}/intermediates/javac/debug", excludes: fileFilter)
+def mainSrc = "${project.projectDir}/src/main/java"
+
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
+
+    group = "Reporting"
+
+    description = "Generate Jacoco Unit coverage reports"
+
+    reports {
+        xml.enabled true
+        html.enabled true
+    }
+
+    sourceDirectories.setFrom(files([mainSrc]))
+    classDirectories.setFrom(files([debugTree]))
+//    additionalSourceDirs.setFrom(files([
+//            "${buildDir}/generated/source/buildConfig/debug",
+//            "${buildDir}/generated/source/r/debug"
+//    ]))
+    executionData.setFrom(fileTree(dir: "$project.buildDir", includes: [
+            '**/*.exec',
+    ]))
+    // Always regenerate report
+    outputs.upToDateWhen { false }
+}
+
+//task jacocoCombinedCoverageReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
+//
+//    group = "Reporting"
+//
+//    description = "Generate Jacoco coverage reports"
+//
+//    reports {
+//        xml.enabled = true
+//        html.enabled = true
+//    }
+//
+//    sourceDirectories.setFrom(files([mainSrc]))
+//    classDirectories.setFrom(files([debugTree]))
+//    additionalSourceDirs.setFrom(files([
+//            "${buildDir}/generated/source/buildConfig/debug",
+//            "${buildDir}/generated/source/r/debug"
+//    ]))
+//    executionData.setFrom(fileTree(dir: project.projectDir, includes: [
+//            '**/*.exec', '**/*.ec'
+//    ]))
+//}
+
+sonarqube {
+    properties {
+        property "sonar.sourceEncoding", "UTF-8"
+        property "sonar.login", "admin"
+        property "sonar.password", "password"
+        property "sonar.projectName", "LoginTest"
+        property "sonar.projectKey", "com.ga_gcs.logintest"
+        property "sonar.language", "java"
+
+        property "sonar.java.binaries", "build/intermediates/javac/debug/classes"
+        property "sonar.java.test.binaries", "build/intermediates/javac/debugUnitTest/classes,build/intermediates/javac/debugAndroidTest/classes"
+        property "sonar.java.coveragePlugin", "jacoco"
+        property "sonar.coverage.exclusions", fileFilter
+
+        property "sonar.sources", "src/main/java"
+        property "sonar.tests", "src/test/java,src/androidTest/java"
+        property "sonar.java.tests", "src/test/java,src/androidTest/java"
+
+        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+        property "sonar.junit.reportsPath", "build/test-results/testDebugUnitTest"
+
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.annotation:annotation:1.3.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
+    implementation "androidx.lifecycle:lifecycle-viewmodel:2.4.0"
+
+    /*  Google  */
+    implementation 'com.google.android.gms:play-services-basement:17.6.0'
+    implementation 'com.google.android.gms:play-services-base:17.6.0'
+
+    /*  Retrofit    */
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2'
+
+    /*  Firebase */
+    implementation platform('com.google.firebase:firebase-bom:29.0.0')
+
+    /*  Unit Testing    */
+    testImplementation 'org.robolectric:robolectric:4.7-alpha-2'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.mockito:mockito-core:4.0.0'
+    testImplementation 'android.arch.core:core-testing:1.1.1'
+
+    /*  Instrumentation Testing     */
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'android.arch.core:core-testing:1.1.1'
+    androidTestImplementation "org.mockito:mockito-android:4.0.0"
+    implementation("com.squareup.okhttp3:mockwebserver:4.9.2")
+}
+
+
+task jacocoTestCoverageVerification(type: JacocoCoverageVerification, dependsOn: 'jacocoTestReport') {
+    sourceDirectories.setFrom(files([mainSrc]))
+    classDirectories.setFrom(files([debugTree]))
+    executionData.setFrom(fileTree(dir: "$buildDir", includes: [
+            '**/*.exec', '**/*.ec'
+    ]))
+    violationRules {
+        failOnViolation = true
+        rule {
+            limit {
+                minimum = 0.95
+            }
+        }
+    }
+}

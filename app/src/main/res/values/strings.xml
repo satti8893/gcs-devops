@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Login Test</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email Id</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in </string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome "</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+
+    <string name="password_hint">"Your password must be at least 8 characters, with at least 1 number and 1 special character"</string>
+    <string name="invalid_credentials">"Invalid Credentials"</string>
+    <string name="no_internet">"No Internet Connection !!!"</string>
+
+</resources>

@@ -1,0 +1,11 @@
+{
+  "statusCode": 400,
+  "error": "Bad Request",
+  "message": "\"password\" with value \"Demo1234\" fails to match the required pattern: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/",
+  "validation": {
+    "source": "payload",
+    "keys": [
+      "password"
+    ]
+  }
+}

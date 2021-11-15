@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1096149954436",
+    "project_id": "ga-gcs",
+    "storage_bucket": "ga-gcs.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1096149954436:android:3079a26aa92c5d9fcbb7d1",
+        "android_client_info": {
+          "package_name": "com.ga_gcs.logintest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1096149954436-m2ek9k5acg59ddevu79rkcmnlrjpiarl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEmzO7n1-OVSHYhCLonUXvxS-W3Z_BQX4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1096149954436-m2ek9k5acg59ddevu79rkcmnlrjpiarl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
