@@ -75,7 +75,7 @@ def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest
 def debugTree = fileTree(dir: "${project.buildDir}/intermediates/javac/debug", excludes: fileFilter)
 def mainSrc = "${project.projectDir}/src/main/java"
 
-task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
 
     group = "Reporting"
 
@@ -93,41 +93,41 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
 //            "${buildDir}/generated/source/r/debug"
 //    ]))
     executionData.setFrom(fileTree(dir: "$project.buildDir", includes: [
-            '**/*.exec',
+            '**/*.exec','**/*.ec',
     ]))
     // Always regenerate report
     outputs.upToDateWhen { false }
 }
 
-//task jacocoCombinedCoverageReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
-//
-//    group = "Reporting"
-//
-//    description = "Generate Jacoco coverage reports"
-//
-//    reports {
-//        xml.enabled = true
-//        html.enabled = true
-//    }
-//
-//    sourceDirectories.setFrom(files([mainSrc]))
-//    classDirectories.setFrom(files([debugTree]))
+task jacocoUITestReport(type: JacocoReport, dependsOn: ['createDebugCoverageReport']) {
+
+    group = "Reporting"
+
+    description = "Generate Jacoco UI coverage reports"
+
+    reports {
+        xml.enabled true
+        html.enabled true
+    }
+
+    sourceDirectories.setFrom(files([mainSrc]))
+    classDirectories.setFrom(files([debugTree]))
 //    additionalSourceDirs.setFrom(files([
 //            "${buildDir}/generated/source/buildConfig/debug",
 //            "${buildDir}/generated/source/r/debug"
 //    ]))
-//    executionData.setFrom(fileTree(dir: project.projectDir, includes: [
-//            '**/*.exec', '**/*.ec'
-//    ]))
-//}
+    executionData.setFrom(fileTree(dir: "$project.buildDir", includes: [
+            '**/*.ec',
+    ]))
+}
 
 sonarqube {
     properties {
+        property "sonar.projectKey", "satti8893_gcs-devops"
+        property "sonar.organization", "satti8893"
+        property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.sourceEncoding", "UTF-8"
-        property "sonar.login", "admin"
-        property "sonar.password", "password"
-        property "sonar.projectName", "LoginTest"
-        property "sonar.projectKey", "com.ga_gcs.logintest"
+        property "sonar.projectName", "gcs-devops"
         property "sonar.language", "java"
 
         property "sonar.java.binaries", "build/intermediates/javac/debug/classes"
@@ -139,7 +139,7 @@ sonarqube {
         property "sonar.tests", "src/test/java,src/androidTest/java"
         property "sonar.java.tests", "src/test/java,src/androidTest/java"
 
-        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml,build/reports/jacoco/jacocoUITestReport/jacocoUITestReport.xml"
         property "sonar.junit.reportsPath", "build/test-results/testDebugUnitTest"
 
     }
