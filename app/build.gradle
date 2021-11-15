@@ -75,7 +75,7 @@ def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest
 def debugTree = fileTree(dir: "${project.buildDir}/intermediates/javac/debug", excludes: fileFilter)
 def mainSrc = "${project.projectDir}/src/main/java"
 
-task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
 
     group = "Reporting"
 
