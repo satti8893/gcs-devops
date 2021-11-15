@@ -37,6 +37,9 @@ jobs:
       ## Setup Android SDK Tools
       - name: Android SDK Tools
         uses: android-actions/setup-android@v2.0.2
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
         
       ## Build Application
       - name: Build SampleApplication
