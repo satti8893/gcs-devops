@@ -61,7 +61,7 @@ jobs:
 
       ## Unit Testing
       - name: Unit Testing
-        run: ./gradlew clean jacocoUnitTestReport
+        run: ./gradlew jacocoUnitTestReport
 
       ## Instrumentation Testing
       - name: Instrumentation Testing
