@@ -36,14 +36,14 @@ jobs:
       
       ## Setup Android SDK Tools
       - name: Android SDK Tools
-        uses: android-actions/setup-android@v2.0.2
+        uses: android-actions/setup-android@v2.0.6
 
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
-        
-      ## Build Application
-      - name: Build SampleApplication
-        run: ./gradlew --no-daemon build
+#      - name: Make gradlew executable
+#        run: chmod +x ./gradlew
+#
+#      ## Build Application
+#      - name: Build SampleApplication
+#        run: ./gradlew --no-daemon build
 
       ## Check emulator
       - name: Emulator check
