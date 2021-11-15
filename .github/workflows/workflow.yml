@@ -31,22 +31,22 @@ jobs:
           distribution: 'adopt'
 
 #      ## Setup Gradle
-#      - name: Gradle
-#        uses: gradle/gradle-build-action@v2
-#        with:
-#          gradle-version: current
-#          wrapper-cache-enabled: true
-#          dependencies-cache-enabled: true
-#          configuration-cache-enabled: true
-      - name: Cache Gradle packages
-        uses: actions/cache@v2.1.6
+      - name: Gradle
+        uses: gradle/gradle-build-action@v2
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          gradle-version: current
+          wrapper-cache-enabled: true
+          dependencies-cache-enabled: true
+          configuration-cache-enabled: true
+#      - name: Cache Gradle packages
+#        uses: actions/cache@v2.1.6
+#        with:
+#          path: |
+#            ~/.gradle/caches
+#            ~/.gradle/wrapper
+#          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+#          restore-keys: |
+#            ${{ runner.os }}-gradle-
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
