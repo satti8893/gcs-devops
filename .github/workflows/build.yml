@@ -34,9 +34,15 @@ jobs:
           java-version: 11
           distribution: 'adopt'
       
-#      ## Setup Android SDK Tools
-#      - name: Android SDK Tools
-#        uses: android-actions/setup-android@v2.0.6
+      ## Setup Gradle
+      - name: Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: current
+          wrapper-cache-enabled: true
+          dependencies-cache-enabled: true
+          configuration-cache-enabled: true
+          arguments: build
 
 #      - name: Make gradlew executable
 #        run: chmod +x ./gradlew
@@ -51,9 +57,12 @@ jobs:
         with:
           api-level: 30
           target: default
-          arch: x86
+          arch: arm64-v8a
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot-load -noaudio -no-boot-anim -camera-back none -camera-front none
           disable-animations: true
+          disable-spellchecker: true
+          avd-name: first_avd
+          ram-size: 2048M
           script: ./graldew connectedCheck
 
 
