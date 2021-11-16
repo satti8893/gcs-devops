@@ -11,8 +11,7 @@ jobs:
   initial_setup:
     name: Initial Setup
     runs-on: ubuntu-latest
-    steps:
-      - id: basic-ci-steps
+    steps: &basic-ci-steps
       ## Checkout our repository ###
       - name: Setup
         uses: actions/checkout@v2.4.0
@@ -54,7 +53,7 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - run: ${{ steps.basic-ci-steps }}
+      - run: *basic-ci-steps
 #      ## Build Application
 #      - name: Build Application
 #        run: ./gradlew assembleDebug
