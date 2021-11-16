@@ -69,6 +69,14 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew sonarqube --info
 
+      - name: Uploading Unit test reports
+        uses: actions/upload-artifact@v2
+        with:
+          name: unit-test-report
+          path: |
+            ./**/build/reports/
+            ./**/build/test-results/
+
   ui_testing:
     name: Android Instrumentation Testing
     runs-on: macos-latest
@@ -114,10 +122,9 @@ jobs:
           disable-animations: true
           script: ./gradlew jacocoUITestReport
 
-      - name: Uploading test reports artifacts
+      - name: Uploading UI test reports
         uses: actions/upload-artifact@v2
         with:
-          name: unit-ui-test-report
+          name: ui-test-report
           path: |
             ./**/build/reports/
-            ./**/build/test-results/
