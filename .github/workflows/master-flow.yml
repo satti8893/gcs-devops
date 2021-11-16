@@ -1,0 +1,125 @@
+name: Android Workflow
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  unit_tests:
+    name: Android Unit Testing
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      ## Checkout our repository ###
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      ## Set up our JDK environment
+      - name: JDK
+        uses: actions/setup-java@v2.3.1
+        with:
+          java-version: 11
+          distribution: 'adopt'
+
+#      ## Setup Gradle
+#      - name: Gradle
+#        uses: gradle/gradle-build-action@v2
+#        with:
+#          gradle-version: current
+#          wrapper-cache-enabled: true
+#          dependencies-cache-enabled: true
+#          configuration-cache-enabled: true
+      - name: Cache Gradle packages
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+#      ## Build Application
+#      - name: Build Application
+#        run: ./gradlew assembleDebug
+
+      ## Lint Checking
+      - name: Lint Checking
+        run: ./gradlew lint
+
+      ## Unit Testing
+      - name: Unit Testing
+        run: ./gradlew jacocoTestReport
+
+  ui_testing:
+    name: Android Instrumentation Testing
+    runs-on: macos-latest
+    steps:
+      ## Instrumentation Testing
+      - name: Instrumentation Testing
+        uses: ReactiveCircus/android-emulator-runner@v2.21.0
+        with:
+          api-level: 29
+          target: default
+          arch: x86
+          profile: Nexus 6
+          disable-animations: true
+          script: ./gradlew jacocoUITestReport
+
+  sonar_analysis:
+    name: SonarCloud Analysis
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    steps:
+      ## Checkout our repository ###
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      ## Set up our JDK environment
+      - name: JDK
+        uses: actions/setup-java@v2.3.1
+        with:
+          java-version: 11
+          distribution: 'adopt'
+
+      ## Sonar Cloud Caching
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v2.1.6
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: SonarCloud Analysis
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonarqube --info
+
+      - name: Uploading test reports artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: unit-ui-test-report
+          path: |
+            ./**/build/reports/
+            ./**/build/test-results/
+
+      - name: Uploading Debug APK artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: unit-ui-test-report
+          path: |
+              ./**/build/outputs/apk/debug/
