@@ -169,7 +169,7 @@ jobs:
         with:
           appId: '1:1096149954436:android:3079a26aa92c5d9fcbb7d1'
           token: '1//0g1jRUJmwrJwiCgYIARAAGBASNwF-L9IrEjAPFMe3vK_5ybP47yhWbbsKcvxlVVigHpt0ouZ5wq9vnjXGHns1pWy73OlCqQf9ak4'
-          groups: GA App Testers
+          groups: ga-app-testers
           file: app/build/outputs/apk/debug/app-debug.apk
 
       - name: Uploading Debug APK
