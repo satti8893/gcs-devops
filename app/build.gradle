@@ -48,6 +48,23 @@ android {
                 jacoco.excludes = ['jdk.internal.*'] // Allows it to run on Java 11
             }
         }
+        lintOptions {
+            // Turns off checks for the issue IDs you specify.
+            disable 'TypographyFractions','TypographyQuotes'
+            // Turns on checks for the issue IDs you specify. These checks are in
+            // addition to the default lint checks.
+            enable 'RtlHardcoded','RtlCompat', 'RtlEnabled'
+            // To enable checks for only a subset of issue IDs and ignore all others,
+            // list the issue IDs with the 'check' property instead. This property overrides
+            // any issue IDs you enable or disable using the properties above.
+            checkOnly 'NewApi', 'InlinedApi'
+            // If set to true, turns off analysis progress reporting by lint.
+            quiet true
+            // if set to true (default), stops the build if errors are found.
+            abortOnError true
+            // if true, only report errors.
+            ignoreWarnings true
+        }
     }
     packagingOptions {
         exclude 'LICENSE.txt'
@@ -93,7 +110,7 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
 //            "${buildDir}/generated/source/r/debug"
 //    ]))
     executionData.setFrom(fileTree(dir: "$project.buildDir", includes: [
-            '**/*.exec','**/*.ec',
+            '**/*.exec'
     ]))
     // Always regenerate report
     outputs.upToDateWhen { false }
@@ -112,10 +129,10 @@ task jacocoUITestReport(type: JacocoReport, dependsOn: ['createDebugCoverageRepo
 
     sourceDirectories.setFrom(files([mainSrc]))
     classDirectories.setFrom(files([debugTree]))
-//    additionalSourceDirs.setFrom(files([
-//            "${buildDir}/generated/source/buildConfig/debug",
-//            "${buildDir}/generated/source/r/debug"
-//    ]))
+    additionalSourceDirs.setFrom(files([
+            "${buildDir}/generated/source/buildConfig/debug",
+            "${buildDir}/generated/source/r/debug"
+    ]))
     executionData.setFrom(fileTree(dir: "$project.buildDir", includes: [
             '**/*.ec',
     ]))
@@ -139,7 +156,7 @@ sonarqube {
         property "sonar.tests", "src/test/java,src/androidTest/java"
         property "sonar.java.tests", "src/test/java,src/androidTest/java"
 
-        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml,build/reports/jacoco/jacocoUITestReport/jacocoUITestReport.xml"
+        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
         property "sonar.junit.reportsPath", "build/test-results/testDebugUnitTest"
 
     }

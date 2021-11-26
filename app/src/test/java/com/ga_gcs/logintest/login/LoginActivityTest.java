@@ -5,18 +5,21 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
+
+import android.widget.Button;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.Observer;
 
+import com.ga_gcs.logintest.R;
 import com.ga_gcs.logintest.constants.GAConstants;
 import com.ga_gcs.logintest.models.Login.User;
 import com.ga_gcs.logintest.models.Responses.Error;
 import com.ga_gcs.logintest.models.Responses.ServerResponse;
-import com.ga_gcs.logintest.repository.LoginRepository;
 import com.ga_gcs.logintest.retrofit.RestServiceTestHelper;
+import com.ga_gcs.logintest.view.login.LoginActivity;
 import com.ga_gcs.logintest.viewModels.LoginViewModel;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 
 import org.junit.After;
@@ -24,6 +27,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
 import java.io.IOException;
@@ -37,8 +41,14 @@ public class LoginActivityTest {
     @Rule
     public InstantTaskExecutorRule instantExecutorRule = new InstantTaskExecutorRule();
 
+    private LoginActivity loginActivity;
+
+    private TextInputLayout tilEmail;
+    private TextInputLayout tilPassword;
+    private Button btnSignIn;
+
     private LoginViewModel loginViewModel;
-    private LoginRepository loginRepository;
+//    private LoginRepository loginRepository;
 
     private Observer<User> successObserver;
     private Observer<Error> invalidObserver;
@@ -58,13 +68,123 @@ public class LoginActivityTest {
         server.start();
         GAConstants.BASE_URL = server.url("/").toString();
 
-        loginRepository = new LoginRepository();
-        loginViewModel = new LoginViewModel(loginRepository);
+        loginActivity = Robolectric.buildActivity(LoginActivity.class).create().resume().get();
+        tilEmail = loginActivity.findViewById(R.id.til_login_id);
+        tilPassword = loginActivity.findViewById(R.id.til_password);
+        btnSignIn = loginActivity.findViewById(R.id.btn_sign_in);
+
+//        loginRepository = new LoginRepository();
+//        loginViewModel = new LoginViewModel(loginRepository);
+
+        loginViewModel = loginActivity.getLoginViewModel();
 
         loginViewModel.getLoginSuccessResult().observeForever(successObserver);
         loginViewModel.getLoginInvalidResult().observeForever(invalidObserver);
         loginViewModel.getLoginFailedResult().observeForever(failedObserver);
         loginViewModel.getServerErrorResult().observeForever(serverErrorObserver);
+    }
+
+    @Test
+    public void test_activity_not_null() throws Exception {
+        assertNotNull(loginActivity);
+    }
+
+    @Test
+    public void test_set_text_entry_field() throws Exception {
+        String expected = "settext";
+        loginActivity.setTILText(tilEmail, expected);
+        assertEquals(expected, loginActivity.getTILText(tilEmail));
+    }
+
+    @Test
+    public void test_get_text_entry_field() throws Exception {
+        String expected = "gettext";
+        loginActivity.setTILText(tilPassword, expected);
+        assertEquals(expected, loginActivity.getTILText(tilPassword));
+    }
+
+    @Test
+    public void test_email_without_domain() {
+        loginViewModel.loginDataChanged("email", "");
+        assertEquals(loginActivity.getString(R.string.invalid_username), tilEmail.getError());
+
+    }
+
+    @Test
+    public void test_email_invalid_domain() {
+        loginViewModel.loginDataChanged("email.com", "");
+        assertEquals(loginActivity.getString(R.string.invalid_username), tilEmail.getError());
+    }
+
+    @Test
+    public void test_email_without_dot_com() {
+        loginViewModel.loginDataChanged("email@gmail", "");
+        assertEquals(loginActivity.getString(R.string.invalid_username), tilEmail.getError());
+    }
+
+    @Test
+    public void test_email_valid() {
+        loginViewModel.loginDataChanged("email@gmail.com", "");
+        assertNull(tilEmail.getError());
+    }
+
+    @Test
+    public void test_email_empty() {
+        loginViewModel.loginDataChanged("", "");
+        assertFalse(loginViewModel.getLoginFormState().getValue().isDataValid());
+    }
+
+    @Test
+    public void test_password_length_invalid() {
+        loginViewModel.loginDataChanged("email@gmail.com", "pass");
+        assertEquals(loginActivity.getString(R.string.invalid_password), tilPassword.getError());
+    }
+
+    @Test
+    public void test_password_empty() {
+        loginViewModel.loginDataChanged("email@gmail.com", "");
+        assertEquals(loginActivity.getString(R.string.invalid_password), tilPassword.getError());
+    }
+
+    @Test
+    public void test_password_invalid_length() {
+        loginViewModel.loginDataChanged("email@gmail.com", "passw");
+        assertEquals(loginActivity.getString(R.string.invalid_password), tilPassword.getError());
+    }
+
+    @Test
+    public void test_password_no_special_character() {
+        loginViewModel.loginDataChanged("email@gmail.com", "Password1");
+        assertEquals(loginActivity.getString(R.string.invalid_password), tilPassword.getError());
+    }
+
+    @Test
+    public void test_password_no_capital_letter() {
+        loginViewModel.loginDataChanged("email@gmail.com", "@password1");
+        assertEquals(loginActivity.getString(R.string.invalid_password), tilPassword.getError());
+    }
+
+    @Test
+    public void test_password_no_number() {
+        loginViewModel.loginDataChanged("email@gmail.com", "@Passwordpassword");
+        assertEquals(loginActivity.getString(R.string.invalid_password), tilPassword.getError());
+    }
+
+    @Test
+    public void test_password_valid() {
+        loginViewModel.loginDataChanged("email@gmail.com", "@Password123");
+        assertNull(tilPassword.getError());
+    }
+
+    @Test
+    public void test_email_password_valid() {
+        loginViewModel.loginDataChanged("email@gmail.com", "@Password123");
+        assertTrue(loginViewModel.isDataValid());
+    }
+
+    @Test
+    public void test_data_invalid_on_button_click() {
+
     }
 
     @Test
@@ -79,6 +199,11 @@ public class LoginActivityTest {
 
         //Pre-test
         assertEquals(null, loginViewModel.getLoginSuccessResult().getValue());
+
+//        loginActivity.setTILText(tilEmail, "satheesh.kumar@generalaeronautics.com");
+//        loginActivity.setTILText(tilPassword, "Password@1234");
+//
+//        btnSignIn.callOnClick();
 
         loginViewModel.login("username", "password");
 
@@ -142,26 +267,6 @@ public class LoginActivityTest {
 
     }
 
-//    @Test
-//    public void test_login_server_exception() throws Exception {
-//        //Prepare Mock data
-//        server.enqueue(new MockResponse()
-//                .setResponseCode(HttpURLConnection.HTTP_INTERNAL_ERROR)
-//                .setBody("")
-//        );
-//
-//        //Pre-test
-//        assertEquals(null, loginViewModel.getServerErrorResult().getValue());
-//
-//        loginViewModel.login("username", "password");
-//
-//        Thread.sleep(5000);
-//
-//        assertTrue(loginViewModel.getServerErrorResult().hasObservers());
-//        assertNotNull(loginViewModel.getServerErrorResult().getValue());
-//
-//    }
-//
     @After
     public void tearDown() throws IOException {
         server.shutdown();
