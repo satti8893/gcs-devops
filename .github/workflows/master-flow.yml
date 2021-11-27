@@ -53,7 +53,7 @@ jobs:
 
       ## Unit Testing
       - name: Unit Testing
-        run: ./gradlew jacocoTestReport
+        run: ./gradlew clean jacocoTestReport
 
       ## Sonar Cloud Caching
       - name: Cache SonarCloud packages
