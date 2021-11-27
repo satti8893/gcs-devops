@@ -67,19 +67,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonarqube --info
+        run: ./gradlew sonarqube -Dsonar.qualitygate.wait=true --info
 
-      - name: Create report-task-https.txt with changed urls
-        run: sed -i s/http\:/https\:/g build/sonar/report-task.txt
-
-      - name: SonarQube Quality Gate check
-        uses: sonarsource/sonarqube-quality-gate-action@master
-        # Force to fail step after specific time
-        timeout-minutes: 3
-        with:
-          scanMetadataReportFile: build/sonar/report-task.txt
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#      - name: Create report-task-https.txt with changed urls
+#        run: sed -i s/http\:/https\:/g build/sonar/report-task.txt
+#
+#      - name: SonarQube Quality Gate check
+#        uses: sonarsource/sonarqube-quality-gate-action@master
+#        # Force to fail step after specific time
+#        timeout-minutes: 3
+#        with:
+#          scanMetadataReportFile: build/sonar/report-task.txt
+#        env:
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Uploading test reports artifacts
         uses: actions/upload-artifact@v2
